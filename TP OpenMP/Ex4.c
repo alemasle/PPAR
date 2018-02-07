@@ -5,7 +5,7 @@
 
 #define NUM_THREAD 4
 
-void recurrence(char * str, char * ascii, char * occ){
+void recurrence(char * str, char * ascii, int * occ){
   for(int i = 0; str[i] != '\0'; i++){
     int tmp = (int) str[i];
     ascii[tmp] = str[i];
@@ -21,24 +21,24 @@ int main(int argc, char ** argv){
   int occ[128];
   int sum = 0, v = 0, c = 0;
   char maps[512];
+  char * stmp;
 
-  memset(ascii,"a", sizeof(ascii));
+  memset(ascii,'a', sizeof(ascii));
   memset(occ, 0, sizeof(occ));
 
-#pragma omp parallel for schedule(dynamic)
+  #pragma omp parallel for schedule(dynamic)
   for(int i = 1; i < argc; i++){
     recurrence(argv[i],ascii, occ);
   }
-
 
   for(int i = 0; i < sizeof(ascii); i++){
     if(ascii[i] == 'a' || ascii[i] == 'e' || ascii[i] == 'i' || ascii[i] == 'o' || ascii[i] == 'u' || ascii[i] == 'y'){
       v ++;
     }
     else{c++;}
-    snprintf(stmp, ascii[i] + ":" + occ[i] + " ",sizeof(""));
-    strncat(maps, stmp, sizeof(stmp);
-    sum += ;
+    snprintf(stmp, sizeof(ascii[i]) + sizeof(":") + sizeof(occ[i]) + sizeof(" "), "%c:%d ", ascii[i], occ[i]);
+    strncat(maps, stmp, sizeof(stmp));
+    sum += occ[i];
   }
 
   printf("\n1.Compute the recurrence of each letter in the text:\n%s\n",maps);
