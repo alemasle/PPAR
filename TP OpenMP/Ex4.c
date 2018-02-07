@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <omp.h>
+
+#define NUM_THREAD 4
+
+typedef struct DICO{
+  char * key;
+  char * value;
+}
+
+int countOccur(char * str, char letter){
+  int res = 0;
+  int l = strlen(str);
+  for(int i = 0; i < l; i++){
+    if(str[i] == l){
+      res ++;
+    }
+  }
+  return res;
+}
+
+void recurrence(char * str, char * ascii, char * occ){
+  #pragma omp parallel for schedule(dynamic)
+  for(int i = 0; str[i] != '\0'; i++){
+
+  }
+}
+
+int main(int argc, char ** argv){
+
+	omp_set_num_threads(NUM_THREAD);
+
+  char ascii[128];
+  int occ[128];
+  DICO dic;
+  int sum = 0, v = 0, c =0;
+  char maps[512];
+
+  memset(ascii,"a", sizeof(ascii));
+  memset(occ, 0, sizeof(occ));
+
+  for(int i = 1; i < argc; i++){
+    recurrence(argv[i],ascii, occ);
+  }
+
+  dic.key=ascii;
+  dic.value=occ;
+
+  for(int i = 0; i < sizeof(ascii); i++){
+    if(ascii[i] == 'a' || ascii[i] == 'e' || ascii[i] == 'i' || ascii[i] == 'o' || ascii[i] == 'u' || ascii[i] == 'y'){
+      v ++;
+    }
+    else{c++;}
+
+    sum += ;
+  }
+
+  printf("\n1.Compute the recurrence of each letter in the text:\n%s\n",maps);
+  printf("2.Compute the number of vowels and consonants from the result of step1:\nvowels = %d\nconsonants = %d\n", v, c);
+  printf("\n3.Compute the total number of letters: %d\n", sum);
+	return 0;
+}
