@@ -48,14 +48,13 @@ int main(int argc, char *argv[]) {
     number = (ascii_code >= 48 && ascii_code <= 57);     // 0-9
     majletter = (ascii_code >= 65 && ascii_code <= 90);  // A-Z
     minletter = (ascii_code >= 97 && ascii_code <= 122); // a-z
+  }
+  // to be completed
 
-    // to be completed
+  // closing
+  free(text);
+  fclose(input);
 
-    // closing
-    free(text);
-    fclose(input);
-
-    // ending
-    return 0;
-  };
+  // ending
+  return 0;
 }
