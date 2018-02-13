@@ -48,8 +48,30 @@ int main(int argc, char *argv[]) {
     number = (ascii_code >= 48 && ascii_code <= 57);     // 0-9
     majletter = (ascii_code >= 65 && ascii_code <= 90);  // A-Z
     minletter = (ascii_code >= 97 && ascii_code <= 122); // a-z
+    
+    if(notpoint && notnewline){
+    	if(!notblank){
+    		if(count != 0){
+	    		printf("%d", count);
+	   		}
+    		count = 0;
+    	}
+		else if(number){printf("%c", text[i]);}
+    	else if(majletter || minletter){count ++;}
+    	
+    	else{
+    		if(count == 0){
+    			printf("%d",count);
+    		}
+    		else{
+    			printf("%d", count); count = 0;
+    		}
+    	}
+    }
+    
   }
-  // to be completed
+  
+  printf("\n");
 
   // closing
   free(text);
