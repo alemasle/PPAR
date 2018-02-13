@@ -45,25 +45,27 @@ int main(int argc, char *argv[]) {
     minletter = (ascii_code >= 97 && ascii_code <= 122); // a-z
 
     if(notpoint && notnewline){
-    	if(!notblank){
-    		if(count != 0){
-	    		printf("%d", count);
-	   		}
-    		count = 0;
-    	}
-		else if(number){printf("%c", text[i]);}
+    	if(number){printf("%c", text[i]);}
     	else if(majletter || minletter){count ++;}
-
     	else{
-    		if(count == 0){
-    			printf("%d",count);
-    		}
-    		else{
+	    	if(!notblank && count != 0){
     			printf("%d", count); count = 0;
+    		}
+    		else if(notblank){
+    			printf("%d0", count);
+    			count = 0;
     		}
     	}
     }
+
   }
+
+  printf("\n");
+
+  // closing
+  free(text);
+  fclose(input);
+
   MPI_Finalize();
   return(0);
 }
