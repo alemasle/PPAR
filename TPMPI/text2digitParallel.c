@@ -3,11 +3,14 @@
 #include <string.h>
 #include <mpi.h>
 
+#define SIZE_MAX 1024
+
 int main(int argc, char *argv[]) {
   int i, n, my_rank, NUMBER_PROC;;
   int count, ascii_code;
   char *text;
   char filename[20];
+  int tab[SIZE_MAX];
   short notblank, notpoint, notnewline;
   short number, minletter, majletter;
   FILE *input;
@@ -45,14 +48,20 @@ int main(int argc, char *argv[]) {
     minletter = (ascii_code >= 97 && ascii_code <= 122); // a-z
 
     if(notpoint && notnewline){
-    	if(number){printf("%c", text[i]);}
+    	if(number){
+    		tab[i] = atoi(text[i]);
+    //		printf("%c", text[i]);
+    	}
     	else if(majletter || minletter){count ++;}
     	else{
 	    	if(!notblank && count != 0){
-    			printf("%d", count); count = 0;
+	    		tab[i] = count;
+  //  			printf("%d", count); count = 0;
     		}
     		else if(notblank){
-    			printf("%d0", count);
+    			tab[i] = count;
+    			tab[i+1] = 0;
+//    			printf("%d0", count);
     			count = 0;
     		}
     	}
@@ -60,7 +69,7 @@ int main(int argc, char *argv[]) {
 
   }
 
-  printf("\n");
+  //printf("\n");
 
   // closing
   free(text);
