@@ -33,7 +33,7 @@ int code(int x,int y,int dx,int dy)
    return i*N + j;
 };
 
-// writing into a cell location 
+// writing into a cell location
 void write_cell(int x,int y,unsigned int value,unsigned int *world)
 {
    int k;
@@ -180,7 +180,7 @@ void neighbors(int x,int y,unsigned int *world,int *nn,int *n1,int *n2)
    // one line down
    dx = -1;  dy = +1;  update(x,y,dx,dy,world,nn,n1,n2);
    dx =  0;  dy = +1;  update(x,y,dx,dy,world,nn,n1,n2);
-   dx = +1;  dy = +1;  update(x,y,dx,dy,world,nn,n1,n2);   
+   dx = +1;  dy = +1;  update(x,y,dx,dy,world,nn,n1,n2);
 
    // one line up
    dx = -1;  dy = -1;  update(x,y,dx,dy,world,nn,n1,n2);
@@ -193,6 +193,7 @@ short newgeneration(unsigned int *world1,unsigned int *world2,int xstart,int xen
 {
    int x,y;
    int nn,n1,n2;
+   int k, pop;
    unsigned int cell;
    short change = 0;
 
@@ -210,9 +211,25 @@ short newgeneration(unsigned int *world1,unsigned int *world2,int xstart,int xen
    {
       for (y = 0; y < N; y++)
       {
-          //
-          // to be completed
-          //
+
+        neighbors(x,y,world1,&nn,&n1,&n2);
+        k = read_cell(x,y,0,0, world1);
+
+        if(k == 0 && nn == 3){ // Si il doit naitre
+          pop = n1 > n2 ? 1 : 2;
+          write_cell(x,y,pop, world2);
+          change = 1;
+        }
+
+        if(k != 0 && (nn > 3 || nn < 2) ){ // Si il doit mourir
+          write_cell(x,y,0,world2);
+          change = 1;
+        }
+
+        else if(k != 0 && (nn <= 3 || nn >= 2) ){ // Si il vit
+          write_cell(x,y,k,world2);
+        }
+
       };
    };
    return change;
@@ -233,7 +250,7 @@ void print(unsigned int *world)
 {
    int i;
    cls();
-   for (i = 0; i < N; i++)  fprintf(stdout,"-");  
+   for (i = 0; i < N; i++)  fprintf(stdout,"-");
 
    for (i = 0; i < N*N; i++)
    {
@@ -244,7 +261,7 @@ void print(unsigned int *world)
    };
    fprintf(stdout,"\n");
 
-   for (i = 0; i < N; i++)  fprintf(stdout,"-");  
+   for (i = 0; i < N; i++)  fprintf(stdout,"-");
    fprintf(stdout,"\n");
    sleep(1);
 };
@@ -256,15 +273,15 @@ int main(int argc,char *argv[])
    unsigned int *world1,*world2;
    unsigned int *worldaux;
 
-   // getting started  
-   world1 = initialize_dummy();
+   // getting started
+   //world1 = initialize_dummy();
    //world1 = initialize_random();
-   //world1 = initialize_glider();
+   world1 = initialize_glider();
    //world1 = initialize_small_exploder();
    world2 = allocate();
    print(world1);
 
-   it = 0;  change = 1; 
+   it = 0;  change = 1;
    while (change && it < itMax)
    {
       change = newgeneration(world1,world2,0,N);
@@ -277,4 +294,3 @@ int main(int argc,char *argv[])
    free(world1);   free(world2);
    return 0;
 };
-
