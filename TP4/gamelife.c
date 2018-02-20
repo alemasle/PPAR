@@ -13,8 +13,8 @@
 #include <unistd.h>
 #include <time.h>
 
-int N = 32;
-int itMax = 20;
+int N = 64;
+int itMax = 100;
 
 // allocation only
 unsigned int* allocate()
@@ -226,7 +226,7 @@ short newgeneration(unsigned int *world1,unsigned int *world2,int xstart,int xen
           change = 1;
         }
 
-        else if(k != 0 && (nn <= 3 || nn >= 2) ){ // Si il vit
+        else if(k != 0 && (nn <= 3 || nn >= 2) ){ // Si il vit, il continue a vivre
           write_cell(x,y,k,world2);
         }
 
@@ -274,9 +274,9 @@ int main(int argc,char *argv[])
    unsigned int *worldaux;
 
    // getting started
-   //world1 = initialize_dummy();
+   world1 = initialize_dummy();
    //world1 = initialize_random();
-   world1 = initialize_glider();
+   //world1 = initialize_glider();
    //world1 = initialize_small_exploder();
    world2 = allocate();
    print(world1);
