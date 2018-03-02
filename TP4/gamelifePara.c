@@ -271,7 +271,7 @@ void print(unsigned int *world)
 // main
 int main(int argc,char *argv[])
 {
-   int it,change, my_rank, NUMBER_PROC, tailleRegion, firstRow, lastRow;
+   int it,change, my_rank, NUMBER_PROC, tailleRegion, firstRow, lastRow, voisinPrec, voisinSuiv;
    unsigned int *world1,*world2;
    unsigned int *fstRow, *lstRow;
    unsigned int *worldaux;
@@ -305,24 +305,32 @@ int main(int argc,char *argv[])
    firstRow = my_rank * tailleRegion;
    lastRow = (my_rank * tailleRegion) + (tailleRegion - 1);
 
+   voisinPrec = ( my_rank - 1 ) % NUMBER_PROC;
+   voisinSuiv = ( my_rank + 1 ) % NUMBER_PROC;
+
    // for(int i = firstRow; i < lastRow ; i++){
    //
    // }
 
 
    it = 0;  change = 1;
+   MPI_Status status;
    while (change && it < itMax)
    {
-      MPI_send(&world2[code(firstRow,0,0,0)], N, MPI_UNSIGNED, my_rank - 1, 0, MPI_COMM_WORLD);
-      MPI_send(&world2[code(lastRow,0,0,0)], N, MPI_UNSIGNED, my_rank + 1, 0, MPI_COMM_WORLD);
-      MPI_recv(&world2[code(lastRow + N,0,0,0)], N, MPI_UNSIGNED, my_rank + 1, 0, MPI_COMM_WORLD);
-      MPI_recv(&world2[code(firstRow - N,0,0,0)], N, MPI_UNSIGNED, my_rank - 1, 0, MPI_COMM_WORLD);
+      MPI_Send(&world2[code(firstRow,0,0,0)], N, MPI_UNSIGNED, voisinPrec, 0, MPI_COMM_WORLD); // Envoie sa premiere colonne a son voisin precedent
+      MPI_Send(&world2[code(lastRow,0,0,0)], N, MPI_UNSIGNED, voisinSuiv, 0, MPI_COMM_WORLD); // Envoie sa derniere colonne a son voison suivant
+      MPI_Recv(&world2[code(lastRow + N,0,0,0)], N, MPI_UNSIGNED, voisinSuiv, 0, MPI_COMM_WORLD, &status); // Recois la premiere colonne du voisin suivant
+      MPI_Recv(&world2[code(firstRow - N,0,0,0)], N, MPI_UNSIGNED, voisinPrec, 0, MPI_COMM_WORLD, &status); // Recois la derniere colonne du voisin precedent
 
       change = newgeneration(world1, world2, firstRow, lastRow);
       worldaux = world1;  world1 = world2;  world2 = worldaux;
 
+      // Gather to rank 0 for printing
+    MPI_Gather(&world1[code(firstRow,0,0,0)], tailleRegion*N, MPI_INT, &world2[code(firstRow,0,0,0)], (N/NUMBER_PROC) / N, MPI_INT, 0, MPI_COMM_WORLD);
 
+    if(my_rank == 0){
       print(world1);
+    }
       it++;
    };
 
