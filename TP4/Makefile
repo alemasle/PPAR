@@ -1,5 +1,5 @@
 
-EXEC = paragol seqgol
+EXEC = seqgol paragol
 
 all: $(EXEC)
 
