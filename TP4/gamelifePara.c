@@ -305,9 +305,9 @@ int main(int argc,char *argv[])
    firstRow = my_rank * tailleRegion;
    lastRow = (my_rank * tailleRegion) + (tailleRegion - 1);
 
-   for(int i = 0; i < ; i++){
-
-   }
+   // for(int i = firstRow; i < lastRow ; i++){
+   //
+   // }
 
 
    it = 0;  change = 1;
