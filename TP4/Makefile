@@ -8,6 +8,7 @@ seqgol:
 
 paragol:
 	mpicc -o paragol gamelifePara.c
+	# Run with mpirun -np n ./paragol
 
 clean:
 	rm $(EXEC)
