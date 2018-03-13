@@ -14,8 +14,8 @@
 #include <time.h>
 #include <mpi.h>
 
-int N = 64;
-int itMax = 100;
+int N = 32;
+int itMax = 64;
 
 // allocation only
 unsigned int* allocate()
@@ -271,7 +271,7 @@ void print(unsigned int *world)
 // main
 int main(int argc,char *argv[])
 {
-   int it,change, my_rank, NUMBER_PROC, tailleRegion, firstRow, lastRow;
+   int it, my_rank, NUMBER_PROC, tailleRegion, firstRow, lastRow, voisinPrec, voisinSuiv;
    unsigned int *world1,*world2;
    unsigned int *fstRow, *lstRow;
    unsigned int *worldaux;
@@ -280,11 +280,13 @@ int main(int argc,char *argv[])
    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
    MPI_Comm_size(MPI_COMM_WORLD, &NUMBER_PROC);
 
-   tailleRegion = N*N/NUMBER_PROC;
+   tailleRegion = N/NUMBER_PROC;
 
-   if(N*N % NUMBER_PROC != 0){
-     printf("Execution abort\n");
-     exit(-1);
+   if(N % NUMBER_PROC != 0){
+     if(my_rank == 0){
+       printf("Execution abort\n");
+       exit(-1);
+    }
    }
 
    if (my_rank == 0) {
@@ -294,6 +296,7 @@ int main(int argc,char *argv[])
      //world1 = initialize_glider();
      world1 = initialize_small_exploder();
    }
+   else{ world1 = allocate();}
 
    world2 = allocate();
 
@@ -302,29 +305,34 @@ int main(int argc,char *argv[])
      print(world1);
    }
 
-   firstRow = my_rank * tailleRegion;
-   lastRow = (my_rank * tailleRegion) + (tailleRegion - 1);
+   firstRow = my_rank * tailleRegion; // Permet a chaque Thread de connaitre ses bornes
+   lastRow = firstRow + tailleRegion;
 
-   // for(int i = firstRow; i < lastRow ; i++){
-   //
-   // }
+   voisinPrec = ( my_rank - 1 + NUMBER_PROC) % NUMBER_PROC; // Signal a chaque thread qui sont ses voisins pour communiquer ses bornes
+   voisinSuiv = ( my_rank + 1) % NUMBER_PROC;
 
-
-   it = 0;  change = 1;
-   while (change && it < itMax)
+   it = 0;
+   MPI_Status status;
+   while (it < itMax)
    {
-      MPI_send(&world2[code(firstRow,0,0,0)], N, MPI_UNSIGNED, my_rank - 1, 0, MPI_COMM_WORLD);
-      MPI_send(&world2[code(lastRow,0,0,0)], N, MPI_UNSIGNED, my_rank + 1, 0, MPI_COMM_WORLD);
-      MPI_recv(&world2[code(lastRow + N,0,0,0)], N, MPI_UNSIGNED, my_rank + 1, 0, MPI_COMM_WORLD);
-      MPI_recv(&world2[code(firstRow - N,0,0,0)], N, MPI_UNSIGNED, my_rank - 1, 0, MPI_COMM_WORLD);
+      newgeneration(world1, world2, firstRow, lastRow); // Pour eviter d'afficher deux fois le premier tableau et ne pas oublier d'afficher le dernier
+                                                        // On le place avant tout pour que chaque thread puisse communiquer ses propres calculs de tableaux
 
-      change = newgeneration(world1, world2, firstRow, lastRow);
+      MPI_Send(&world2[code(firstRow,0,0,0)], N, MPI_UNSIGNED, voisinPrec, 0, MPI_COMM_WORLD); // Envoie sa premiere colonne a son voisin precedent
+      MPI_Send(&world2[code(lastRow -1,0,0,0)], N, MPI_UNSIGNED, voisinSuiv, 0, MPI_COMM_WORLD); // Envoie sa derniere colonne a son voison suivant
+
+      MPI_Recv(&world2[code(firstRow -1,0,0,0)], N, MPI_UNSIGNED, voisinPrec , 0, MPI_COMM_WORLD, &status); // Recois la premiere colonne du voisin suivant
+      MPI_Recv(&world2[code(lastRow,0,0,0)], N, MPI_UNSIGNED, voisinSuiv, 0, MPI_COMM_WORLD, &status); // Recois la derniere colonne du voisin precedent
+
       worldaux = world1;  world1 = world2;  world2 = worldaux;
-
-
-      print(world1);
       it++;
-   };
+
+      MPI_Gather(&world1[code(firstRow,0,0,0)], tailleRegion*N, MPI_UNSIGNED, &world2[code(firstRow,0,0,0)], tailleRegion * N, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+
+      if(my_rank == 0){
+        print(world2);
+      }
+   }
 
    // ending
    MPI_Finalize();
