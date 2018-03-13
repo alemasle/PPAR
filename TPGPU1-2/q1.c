@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+////////// QUESTION 1 //////////
+
 /**
 * increase and decrease
 */
@@ -30,6 +32,12 @@ void log2_series(int n){
 
   printf("%f\n%f\n", res, res2);
 }
+
+//////////// QUESTION 2 /////////////
+/*
+* Float soustraction n'est pas assiocatif
+*
+*/
 
 int main(int argc, char ** argv){
 
