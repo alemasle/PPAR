@@ -1,0 +1,4 @@
+6. La divergence se fait entre le moment où on lis une cellule et le moment où l'on va la modifier.
+On utilise la fonction __syncthreads pour attendre que tous les threads aient eu le temps d'écrire la valeur de leur cellule dans le tableau de cellules partagé.
+
+7. Lorsque l'on compile avec l'option de compilation -Xptxas=-v, nvcc nous affiches 23 registres.
